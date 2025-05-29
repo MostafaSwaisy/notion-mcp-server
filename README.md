@@ -212,4 +212,4 @@ If you encounter issues:
 * Refer to [Notion API Documentation](https://developers.notion.com/docs) for further help
 
 ---
-written by Mostafa Swaisy 💡 and Puma 🤝 (OpenAI GPT) and 
+written by Mostafa Swaisy 💡 and Puma 🤝 (OpenAI GPT)  
