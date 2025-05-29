@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion MCP Server - API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .endpoint-section {
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .endpoint-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .endpoint-header {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .endpoint-method {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .method-post { background: #e74c3c; }
+        .method-get { background: #27ae60; }
+        .method-put { background: #f39c12; }
+        .method-delete { background: #e67e22; }
+
+        .endpoint-content {
+            padding: 25px;
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .description {
+            margin: 15px 0;
+            color: #5d6d7e;
+            font-size: 1rem;
+        }
+
+        .params-section {
+            margin-top: 20px;
+        }
+
+        .params-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .param-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .param-name {
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .param-type {
+            background: #ecf0f1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-left: 8px;
+        }
+
+        .param-required {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .param-optional {
+            background: #95a5a6;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .example-section {
+            margin-top: 20px;
+            background: #2c3e50;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .example-header {
+            background: #34495e;
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+        }
+
+        .example-code {
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #ecf0f1;
+            overflow-x: auto;
+        }
+
+        .setup-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .setup-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .setup-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .setup-steps li {
+            counter-increment: step-counter;
+            margin-bottom: 15px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .setup-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #3498db;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .code-inline {
+            background: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Notion MCP Server</h1>
+            <p>Model Context Protocol server for seamless Notion workspace integration</p>
+        </div>
+
+        <div class="setup-section">
+            <h2 class="setup-title">🔧 Setup Instructions</h2>
+            <ol class="setup-steps">
+                <li>Install dependencies: <span class="code-inline">npm install</span></li>
+                <li>Create a Notion integration at <a href="https://www.notion.so/my-integrations" target="_blank">https://www.notion.so/my-integrations</a></li>
+                <li>Copy your integration token</li>
+                <li>Create a <span class="code-inline">.env</span> file and add your token: <span class="code-inline">NOTION_TOKEN=your_token_here</span></li>
+                <li>Share your Notion pages/databases with your integration</li>
+                <li>Start the server: <span class="code-inline">npm start</span></li>
+            </ol>
+            
+            <div class="warning">
+                <div class="warning-title">⚠️ Important:</div>
+                Make sure to share your Notion pages or databases with your integration, otherwise the API calls will fail with permission errors.
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">POST /api/pages</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">Create a new page</div>
+                </div>
+                <span class="endpoint-method method-post">POST</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Creates a new page in your Notion workspace with the specified title and content.</div>
+                
+                <div class="params-section">
+                    <div class="params-title">Request Body Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">title</span>
+                        <span class="param-type">string</span>
+                        <span class="param-required">required</span>
+                        <div>The title of the new page</div>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">content</span>
+                        <span class="param-type">string</span>
+                        <span class="param-optional">optional</span>
+                        <div>The content of the page (supports multiple paragraphs separated by double newlines)</div>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">parentId</span>
+                        <span class="param-type">string</span>
+                        <span class="param-optional">optional</span>
+                        <div>ID of the parent page (if not provided, uses database ID from environment)</div>
+                    </div>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-header">Example Request</div>
+                    <div class="example-code">{
+  "title": "My New Page",
+  "content": "This is the first paragraph.\n\nThis is the second paragraph with more content."
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">GET /api/pages/:pageId</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">Read a specific page</div>
+                </div>
+                <span class="endpoint-method method-get">GET</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Retrieves a specific page by its ID, including title, content, and metadata.</div>
+                
+                <div class="params-section">
+                    <div class="params-title">URL Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">pageId</span>
+                        <span class="param-type">string</span>
+                        <span class="param-required">required</span>
+                        <div>The unique identifier of the page to retrieve</div>
+                    </div>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-header">Example Request</div>
+                    <div class="example-code">GET /api/pages/550e8400-e29b-41d4-a716-446655440000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">GET /api/search</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">Search pages by title</div>
+                </div>
+                <span class="endpoint-method method-get">GET</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Searches for pages in your Notion workspace by title using the provided query string.</div>
+                
+                <div class="params-section">
+                    <div class="params-title">Query Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">query</span>
+                        <span class="param-type">string</span>
+                        <span class="param-required">required</span>
+                        <div>The search term to look for in page titles</div>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">limit</span>
+                        <span class="param-type">number</span>
+                        <span class="param-optional">optional</span>
+                        <div>Maximum number of results to return (default: 10)</div>
+                    </div>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-header">Example Request</div>
+                    <div class="example-code">GET /api/search?query=meeting notes&limit=5</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">PUT /api/pages/:pageId</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">Update an existing page</div>
+                </div>
+                <span class="endpoint-method method-put">PUT</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Updates an existing page's title and/or content. Only provided fields will be updated.</div>
+                
+                <div class="params-section">
+                    <div class="params-title">URL Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">pageId</span>
+                        <span class="param-type">string</span>
+                        <span class="param-required">required</span>
+                        <div>The unique identifier of the page to update</div>
+                    </div>
+                </div>
+
+                <div class="params-section">
+                    <div class="params-title">Request Body Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">title</span>
+                        <span class="param-type">string</span>
+                        <span class="param-optional">optional</span>
+                        <div>New title for the page</div>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">content</span>
+                        <span class="param-type">string</span>
+                        <span class="param-optional">optional</span>
+                        <div>New content for the page (replaces existing content)</div>
+                    </div>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-header">Example Request</div>
+                    <div class="example-code">{
+  "title": "Updated Page Title",
+  "content": "This is the updated content.\n\nWith multiple paragraphs."
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">DELETE /api/pages/:pageId</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">Archive a page</div>
+                </div>
+                <span class="endpoint-method method-delete">DELETE</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Archives (soft deletes) a page in Notion. The page will be moved to trash but not permanently deleted.</div>
+                
+                <div class="params-section">
+                    <div class="params-title">URL Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">pageId</span>
+                        <span class="param-type">string</span>
+                        <span class="param-required">required</span>
+                        <div>The unique identifier of the page to archive</div>
+                    </div>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-header">Example Request</div>
+                    <div class="example-code">DELETE /api/pages/550e8400-e29b-41d4-a716-446655440000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">GET /api/pages</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">List all pages</div>
+                </div>
+                <span class="endpoint-method method-get">GET</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Retrieves a list of all pages in your Notion workspace with pagination support.</div>
+                
+                <div class="params-section">
+                    <div class="params-title">Query Parameters:</div>
+                    <div class="param-item">
+                        <span class="param-name">page_size</span>
+                        <span class="param-type">number</span>
+                        <span class="param-optional">optional</span>
+                        <div>Number of pages to return per request (default: 10, max: 100)</div>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">start_cursor</span>
+                        <span class="param-type">string</span>
+                        <span class="param-optional">optional</span>
+                        <div>Cursor for pagination (returned in previous response)</div>
+                    </div>
+                </div>
+
+                <div class="example-section">
+                    <div class="example-header">Example Request</div>
+                    <div class="example-code">GET /api/pages?page_size=20</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint-section">
+            <div class="endpoint-header">
+                <div>
+                    <div class="endpoint-url">GET /health</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">Health check endpoint</div>
+                </div>
+                <span class="endpoint-method method-get">GET</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="description">Simple health check endpoint to verify the server is running properly.</div>
+                
+                <div class="example-section">
+                    <div class="example-header">Example Response</div>
+                    <div class="example-code">{
+  "status": "healthy",
+  "service": "Notion MCP Server",
+  "timestamp": "2025-05-29T10:30:00.000Z"
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <h2 class="setup-title">📋 Response Format</h2>
+            <p style="margin-bottom: 20px;">All endpoints return JSON responses with a consistent structure:</p>
+            
+            <div class="example-section">
+                <div class="example-header">Success Response</div>
+                <div class="example-code">{
+  "success": true,
+  "data": {
+    // Response data here
+  }
+}</div>
+            </div>
+
+            <div class="example-section" style="margin-top: 15px;">
+                <div class="example-header">Error Response</div>
+                <div class="example-code">{
+  "error": "Error message",
+  "details": "Detailed error information"
+}</div>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <h2 class="setup-title">🔑 Authentication</h2>
+            <p>The server uses your Notion integration token for authentication. Make sure to:</p>
+            <ul style="margin: 15px 0; padding-left: 20px;">
+                <li>Keep your token secure and never expose it in client-side code</li>
+                <li>Share your Notion pages/databases with your integration</li>
+                <li>Grant appropriate permissions to your integration (read, write, etc.)</li>
+            </ul>
+        </div>
+
+        <div class="setup-section">
+            <h2 class="setup-title">🚨 Common Error Codes</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px;">
+                <div class="param-item">
+                    <span class="param-name">400 Bad Request</span>
+                    <div>Missing required parameters or invalid request format</div>
+                </div>
+                <div class="param-item">
+                    <span class="param-name">401 Unauthorized</span>
+                    <div>Invalid or missing Notion integration token</div>
+                </div>
+                <div class="param-item">
+                    <span class="param-name">403 Forbidden</span>
+                    <div>Page not shared with your integration</div>
+                </div>
+                <div class="param-item">
+                    <span class="param-name">404 Not Found</span>
+                    <div>Page not found or doesn't exist</div>
+                </div>
+                <div class="param-item">
+                    <span class="param-name">500 Internal Server Error</span>
+                    <div>Server error or Notion API issue</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <h2 class="setup-title">💡 Usage Tips</h2>
+            <ul style="margin: 15px 0; padding-left: 20px; line-height: 1.8;">
+                <li><strong>Content Formatting:</strong> Use double newlines (\n\n) to separate paragraphs in content</li>
+                <li><strong>Page IDs:</strong> You can find page IDs in the URL when viewing a page in Notion</li>
+                <li><strong>Search:</strong> The search function looks for matches in page titles, not content</li>
+                <li><strong>Pagination:</strong> Use the next_cursor from responses to get more results</li>
+                <li><strong>Rate Limits:</strong> Notion API has rate limits, so avoid making too many rapid requests</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; color: white;">
+            <h3 style="margin-bottom: 10px;">🎉 Ready to integrate with Notion!</h3>
+            <p>Your MCP server is now ready to handle all your Notion workspace operations.</p>
+        </div>
+    </div>
+</body>
+</html>
